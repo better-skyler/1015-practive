@@ -1,0 +1,51 @@
+# Analysis {#sec-analysis}
+
+```{r}
+#| label: setup-analysis
+#| include: false
+here::i_am("manuscript/_quarto.yml")
+source(here::here("manuscript", "_setup.R"))
+```
+
+Figures are built inline from pipeline targets with ggplot; they are never registered as targets or written to disk.
+@fig-flipper-fit shows the example pattern, with data and fitted lines distinguished in the legend.
+
+```{r}
+#| label: fig-flipper-fit
+#| fig-cap: "Body mass and flipper length by species"
+#| fig-notes: "Palmer penguins, observations with recorded sex and body mass. Lines are species-specific linear fits."
+ggplot() +
+  geom_point(
+    data = penguins_clean,
+    aes(x = flipper_len, y = body_mass, color = species, shape = species),
+    alpha = 0.5,
+    size = 1
+  ) +
+  geom_line(
+    data = analysis_flipper_fit$pred,
+    aes(x = flipper_len, y = body_mass, color = species)
+  ) +
+  scale_species(name = NULL) +
+  labs(x = "Flipper length (mm)", y = "Body mass (g)") +
+  theme(
+    legend.position = "inside",
+    legend.position.inside = c(0.15, 0.9)
+  )
+```
+
+Regression tables are built by `modelsummary()` from the model objects the
+pipeline stores, not from a hand-assembled coefficient table (@tbl-flipper-fit).
+
+```{r}
+#| label: tbl-flipper-fit
+#| tbl-cap: "Body mass on flipper length, by species"
+modelsummary(
+  analysis_flipper_fit$models,
+  output = "tinytable",
+  coef_map = c(flipper_len = "Flipper length (mm)", "(Intercept)" = "Constant"),
+  gof_map = c("nobs", "r.squared"),
+  stars = STARS,
+  notes = notes_text("OLS by species on the estimation sample. Heteroskedasticity-robust standard errors in parentheses.")
+) |>
+  theme_mitex()
+```

@@ -1,0 +1,11 @@
+# Introduction {#sec-intro}
+
+```{r}
+#| label: setup-intro
+#| include: false
+here::i_am("manuscript/_quarto.yml")
+source(here::here("manuscript", "_setup.R"))
+```
+
+Write the introduction here.
+Every empirical number in the prose is computed inline from pipeline targets, never typed as a literal: the sample contains `r nrow(penguins_clean)` penguins.
